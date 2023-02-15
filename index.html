@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPT-3 Image Test</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: black;
+    }
+    .wrap {
+      width: 600px;
+      background-color: #fff;
+      box-shadow: 1px 0 1px rgba(255, 255, 255, 0.3), 3px 0 1px rgba(255, 255, 255, 0.2);
+      margin: 5% auto;
+      padding: 15px;
+    }
+    h1 {
+      text-align: center;
+      margin: 15px 0;
+    }
+    .input-box {
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .input-box a {
+      flex: 0 1 auto;
+      display: block;
+      padding: 6px 8px;
+      background-color: gray;
+      color: #fff;
+      text-align: center;
+      text-decoration: none;
+    }
+    input {
+      width: 89%;
+      padding: 6px 8px;
+      font-size: 18px;
+      font-weight: 400;
+      color: gray;
+    }
+    input:focus {
+      outline: 0;
+    }
+    .output-box {
+      height: 300px;
+      border: 2px solid #000;
+      padding: 15px;
+      gap: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .output-box img {
+      display: block;
+      object-fit: cover;
+      max-width: 100%;
+      height: auto;
+      height: 256px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="wrap">
+      <h1>GPT-3 圖片產生</h1>
+      <div class="input-box">
+        <input type="text" placeholder="請輸入敘述文句" v-model="inputText">
+        <a @click="getGptImage" href="javascript:;">送出</a>
+      </div>
+      <div class="output-box">
+        <div>
+          <img :src="imgUrls[0]" alt="">
+        </div>
+        <div>
+          <img :src="imgUrls[1]" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.2/axios.min.js"></script>
+  <script src="https://unpkg.com/vue@next"></script>
+  <script>
+    const app = Vue.createApp({
+      data () {
+        return {
+          imgUrls: [],
+          inputText: '',
+          a: 1
+        }
+      },
+      methods: {
+        getGptImage () {
+          axios.get(`http://104.155.212.175//api/getImage?prompt=${this.inputText}`)
+          .then(res => {
+            res.data.forEach(item => {
+              this.imgUrls.push(item.url)
+            })
+          }).catch(err => {
+            console.log(err)
+          })
+        }
+      }
+    })
+    app.mount('#app')
+
+  </script>
+</body>
+</html>
