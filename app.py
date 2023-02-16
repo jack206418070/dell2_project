@@ -52,12 +52,13 @@ def getImage():
   res = gptImage(prompt)
   return jsonify(res)
 
-@app.route('/')
-def index():
-  return render_template('index_0216.html')
+# @app.route('/')
+# def index():
+#   return render_template('index_0216.html')
 
-@app.route('/dell')
+@app.route('/')
 def dell():
   return render_template('index.html')
 
-app.run()
+if __name__ == "__main__":
+  app.run()
