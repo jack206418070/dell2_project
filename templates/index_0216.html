@@ -315,7 +315,7 @@
          <iframe style="width:100%;height:100%;" src="https://www.youtube.com/embed/0T2HCbv9FBQ?controls=0&start=173&autoplay=1&mute=1&disablekb=1&loop=1&color=white" title="YouTube video player" frameborder="0"></iframe>
        </div>
        <div v-if="item.type == 'draw-gpt'" style="height:100%;">
-        <iframe style="width:100%;height:100%; border-radius: 20px;" :src="/dell" title="DELL.E" frameborder="0"></iframe>
+        <iframe style="width:100%;height:100%; border-radius: 20px;" :src="`${domain}dell`" title="DELL.E" frameborder="0"></iframe>
       </div>
        <a v-if="item.type == 'twitter22'" class="twitter-timeline" data-dnt="true" data-theme="dark" href="https://twitter.com/lightthenight_?ref_src=twsrc%5Etfw">Tweets by lightthenight_</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
        <div v-if="item.type == 'npc_fixed_talk'" class="npc_fixed_talk"></div>
@@ -461,7 +461,8 @@
           _see : true,
           type: "draw-gpt"
         }
-      ]
+      ],
+      domain: ''
     },
     methods: {
     },
@@ -478,6 +479,9 @@
       "keyState._40":function(data){
         if(data) return move(40)
       }
+    },
+    mounted () {
+      this.domain = location.href
     }
   })
   
