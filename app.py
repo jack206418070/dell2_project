@@ -12,7 +12,7 @@ app = Flask(
   static_url_path='/'
 )
 CORS(app)
-openai.api_key = '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' # your api key
+openai.api_key = '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' # your api key
 openai.Model.list()
 
 def gptImage(prompt):
