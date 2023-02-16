@@ -5,6 +5,8 @@ import openai
 # from pathlib import Path
 from flask import Flask, render_template, make_response, redirect, url_for, session, flash, jsonify, send_from_directory, request
 from flask_cors import CORS
+import os
+
 
 app = Flask(
   __name__,
@@ -12,8 +14,8 @@ app = Flask(
   static_url_path='/'
 )
 CORS(app)
-openai.api_key = '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' # your api key
-# openai.Model.list()
+openai.api_key = os.getenv("OPENAI_API_KEY") # your api key
+openai.Model.list()
 
 def gptImage(prompt):
   print(prompt)
@@ -33,17 +35,17 @@ def gptImage(prompt):
   # json.dump(res, file)
   return res['data']
 
-def chatAI():
-  res = openai.Completion.create(
-    model="text-davinci-003",
-    prompt='嗨!',
-    temperature=1,
-    max_tokens=256,
-    top_p=1,
-    frequency_penalty=0,
-    presence_penalty=0.6
-  )
-  print(res['choices'][0]['text'].strip())
+# def chatAI():
+#   res = openai.Completion.create(
+#     model="text-davinci-003",
+#     prompt='嗨!',
+#     temperature=1,
+#     max_tokens=256,
+#     top_p=1,
+#     frequency_penalty=0,
+#     presence_penalty=0.6
+#   )
+#   print(res['choices'][0]['text'].strip())
 # chatAI()
 
 @app.route('/api/getImage')
