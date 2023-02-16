@@ -1,0 +1,868 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>byom</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://mapsystem3245.firebaseapp.com/css/normalize.css">
+  <link rel="stylesheet" href="https://mapsystem3245.firebaseapp.com/css/main.css">
+  <link rel="stylesheet" href="https://mapsystem3245.firebaseapp.com/css/animsition.min.css">
+  <style>
+    body{
+      background: #000;
+    }
+    #content{
+      width: 100%;
+      height: 100vh;
+      overflow: auto;
+      background: black;
+      display: flex;
+      overflow: hidden;
+    }
+    #map_keyboard{
+      position: fixed;
+      bottom: 25px;
+      right: 120px;
+      display: flex;
+      gap: 7px;
+      z-index: 30000;
+    }
+    #map_keyboard>div{
+      width: 50px;
+      height: 50px;
+      background-size: cover;
+      display: inline-block;
+    }
+    #map_keyboard>div:first-child{
+      position: relative;
+      top: -58px;
+      right: -114px;
+      background-image: url(https://mapsystem3245.firebaseapp.com/img6/button_top.png)
+    }
+    #map_keyboard>div:first-child + div{
+      background-image: url(https://mapsystem3245.firebaseapp.com/img6/button_left.png)
+    }
+    #map_keyboard>div:first-child + div + div{
+      background-image: url(https://mapsystem3245.firebaseapp.com/img6/button_bottom.png)
+    }
+    #map_keyboard>div:first-child + div + div + div{
+      background-image: url(https://mapsystem3245.firebaseapp.com/img6/button_right.png)
+    }
+    .npc_fixed_talk{
+      background-image:url(https://mapsystem3245.firebaseapp.com/img-use/Fixed_Dialog.png);
+      background-size:contain;
+      background-repeat:no-repeat;
+      background-position:center;
+      width:100%;
+      height:100%;
+    }
+    #map{
+      width: 2500px;
+      height: 1400px;
+      position: relative;
+      background-color: black;
+      flex-shrink: 0;
+      margin: auto;
+      background-image: url(https://mapsystem3245.firebaseapp.com/img5/new_map01.png);
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+    .obj{
+      position: absolute;
+      z-index: 0;
+    }
+    .obj.see{
+      opacity: 0.6;
+    }
+    .obj.see:before{
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px 11px rgb(255 220 0 / 50%);
+    }
+    .obj.see:after{
+      content: "Twitter佈告欄↓";
+      position: absolute;
+      top: -66px;
+      right: 10%;
+      padding: 6px 12px;
+      background: #512b90;
+      color: #45fafd;
+      border: 3px solid #fd30fc;
+      border-radius: 10px;
+      font-size: 16px;
+      letter-spacing: 0.1em;
+      font-weight: bold;
+    }
+    #obj_4.obj.see:after{
+      content: "產品發表會↓";
+    }
+    #obj_11.obj.see:after{
+      content: "作圖區域↓";
+    }
+    #obj_1.obj.see:after{
+      content: "↑光HIKARI 酒店";
+      top: unset;
+      bottom: -49px;
+      right: -39px;
+      opacity: 1 !important;
+    }
+    #obj_3.obj.see:after{
+      content: "↓歡迎光臨";
+      width: 125px;
+      text-align: center;
+      right: -25px;
+      top: -48px;
+    }
+    #obj_6.obj.see:after{
+      content: "新東陽聯名肉乾↑";
+      width: 175px;
+      text-align: center;
+      top: unset;
+      bottom: -49px;
+      right: -39px;
+      opacity: 1 !important;
+    }
+    #obj_11.obj.see {
+      opacity: 1;
+    }
+    #obj_11.obj.see:before {
+      z-index: -1;
+    }
+    .obj.see.into:before,#obj_7.obj.see:before,#obj_7.obj.see:after,#obj_8.obj.see:before,#obj_8.obj.see:after,#obj_10.obj.see:before,#obj_10.obj.see:after{
+      display: none;
+    }
+    .obj.into{
+      background:#ff0000;
+      opacity: 1;
+      animation: intoFade 800ms infinite;
+    }
+    @keyframes intoFade {
+      from {
+        opacity: 0.3;
+      }
+      50% {
+        opacity: 0.5;
+      }
+      to {
+        opacity: 0.3;
+      }
+    }
+    @keyframes Walkingwalking {
+      from {
+        top: 6%;
+      }
+      50% {
+        top: 28%;
+      }
+      to {
+        top: 6%;
+      }
+    }
+    @keyframes Walkingwalking-line {
+      from {
+        right: 9%;
+      }
+      50% {
+        right: 2%;
+      }
+      to {
+        right: 9%;
+      }
+    }
+    .obj img{
+      width: 100%;
+    }
+    .character{
+      position: absolute;
+      z-index: 1000;
+    }
+    .character img{
+      height: 100%;
+    }
+    #obj_1{
+      opacity: 1 !important;
+      z-index: 10;
+    }
+    #obj_3{
+      z-index: 11;
+    }
+    #obj_4{
+      opacity: 1 !important;
+      z-index: 10;
+    }
+    #obj_5{
+      opacity: 1 !important;
+      z-index: 2;
+      border-radius: 5px;
+      border: 5px solid #321b15;
+    }
+    #obj_6{
+      background: #ff000099 !important;
+    }
+    #obj_7{
+      opacity: 1 !important;
+      background: none !important;
+      width: 700px;
+      height: 250px;
+      z-index: 10;
+      position: fixed;
+      bottom: 25px;
+      right: 30%;
+    }
+    #obj_8{
+      right: 5.2%;
+      top: 34%;
+      width: 80px;
+      height: 146px;
+      opacity: 1;
+      background: transparent;
+      background-image: url(https://mapsystem3245.firebaseapp.com/demo-img/npc-inhouse.gif);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      padding: 0;
+      opacity: 0.85;
+      animation: Walkingwalking-line 4000ms infinite linear;
+    }
+    #obj_9{
+      left: 4%;
+      top: 40%;
+      width: 80px;
+      height: 146px;
+      opacity: 1;
+      background: transparent;
+      background-image: url(https://mapsystem3245.firebaseapp.com/demo-img/npc-inhouse.gif);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      padding: 0;
+      opacity: 0.85;
+    }
+    #obj_10{
+      left: 34%;
+      top: 6%;
+      width: 80px;
+      height: 146px;
+      opacity: 1;
+      background: transparent;
+      background-image: url(https://mapsystem3245.firebaseapp.com/demo-img/npc-inhouse.gif);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      padding: 0;
+      opacity: 0.85;
+      animation: Walkingwalking 8000ms infinite linear;
+    }
+    #obj_4 iframe,#obj_5 iframe{
+      position: relative;
+      z-index: 2;
+    }
+    .twitter-timeline.twitter-timeline-rendered{
+      height: 404px;
+      overflow: overlay;
+      border-radius: 15px;
+    }
+  </style>
+</head>
+<body class="animsition">
+ 
+ <!--預先載入-->
+ <div style="display: none" >
+   <img src="https://mapsystem3245.firebaseapp.com/img5/new_map.png">
+   
+   <img src="https://mapsystem3245.firebaseapp.com/img5/down_0.png">
+   <img src="https://mapsystem3245.firebaseapp.com/img5/down_1.png">
+   <img src="https://mapsystem3245.firebaseapp.com/img5/down_2.png">
+   <img src="https://mapsystem3245.firebaseapp.com/img5/down_3.png">
+   <img src="https://mapsystem3245.firebaseapp.com/img5/left_0.png">
+   <img src="https://mapsystem3245.firebaseapp.com/img5/left_1.png">
+   <img src="https://mapsystem3245.firebaseapp.com/img5/left_2.png">
+   <img src="https://mapsystem3245.firebaseapp.com/img5/left_3.png">   
+   <img src="https://mapsystem3245.firebaseapp.com/img5/right_0.png">   
+   <img src="https://mapsystem3245.firebaseapp.com/img5/right_1.png">   
+   <img src="https://mapsystem3245.firebaseapp.com/img5/right_2.png">   
+   <img src="https://mapsystem3245.firebaseapp.com/img5/right_3.png">   
+   <img src="https://mapsystem3245.firebaseapp.com/img5/up_0.png">   
+   <img src="https://mapsystem3245.firebaseapp.com/img5/up_1.png">   
+   <img src="https://mapsystem3245.firebaseapp.com/img5/up_2.png">   
+   <img src="https://mapsystem3245.firebaseapp.com/img5/up_3.png">  
+ </div>
+ 
+ 
+ <div id="content">
+   <div id="map">
+     <div v-for="(item,index) in character" :id="'character_' + item.id" class="character" :style="{ 
+        left: item.x + 'px',
+        top: item.y + 'px',
+        height: item.height + 'px'
+      }">
+       <img :src="character[0].src">
+     </div>
+     <div v-for="(item,index) in obj" :id="'obj_' + item.id" :class="{see : item._see, into : item.type == 'into'}" class="obj" :style="{ 
+        left: item.x + 'px',
+        top: item.y + 'px',
+        width: item.width + 'px',
+        height: item.height + 'px'
+      }">
+       <a v-if="item.type == 'into'" class="animsition-link" :href="item.url"></a>
+       <div v-if="item.type == 'youtube'" style="height:100%;">
+         <iframe style="width:100%;height:100%;" src="https://www.youtube.com/embed/0T2HCbv9FBQ?controls=0&start=173&autoplay=1&mute=1&disablekb=1&loop=1&color=white" title="YouTube video player" frameborder="0"></iframe>
+       </div>
+       <div v-if="item.type == 'draw-gpt'" style="height:100%;">
+        <iframe style="width:100%;height:100%; border-radius: 20px;" :src="/dell" title="DELL.E" frameborder="0"></iframe>
+      </div>
+       <a v-if="item.type == 'twitter22'" class="twitter-timeline" data-dnt="true" data-theme="dark" href="https://twitter.com/lightthenight_?ref_src=twsrc%5Etfw">Tweets by lightthenight_</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+       <div v-if="item.type == 'npc_fixed_talk'" class="npc_fixed_talk"></div>
+       <div v-if="item.type == 'npc_ppl'" class="npc_ppl"></div>
+       <div v-if="item.type == 'npc_ppl2'" class="npc_ppl2"></div>
+       <div v-if="item.type == 'npc_ppl3'" class="npc_ppl3"></div>
+     </div>
+   </div>
+   <div id="map_keyboard">
+     <div @touchstart="vm.keyState['_38'] = true" @touchend="vm.keyState['_38'] = true" @mousedown = "vm.keyState['_38'] = true" @mouseup = "vm.keyState['_38'] = false"></div>
+     <div @touchstart="vm.keyState['_37'] = true" @touchend="vm.keyState['_37'] = true" @mousedown = "vm.keyState['_37'] = true" @mouseup = "vm.keyState['_37'] = false"></div>
+     <div @touchstart="vm.keyState['_40'] = true" @touchend="vm.keyState['_40'] = true" @mousedown = "vm.keyState['_40'] = true" @mouseup = "vm.keyState['_40'] = false"></div>
+     <div @touchstart="vm.keyState['_39'] = true" @touchend="vm.keyState['_39'] = true" @mousedown = "vm.keyState['_39'] = true" @mouseup = "vm.keyState['_39'] = false"></div>
+   </div>
+ </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.22/vue.min.js"></script>
+<script src="https://webfile-68.web.app/coloradmin/assets/plugins/jquery/jquery-1.9.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/ScrollToPlugin.min.js"></script>
+<script src="https://mapsystem3245.firebaseapp.com/js/animsition.min.js"></script>
+
+<script>
+  const move_distance = 60; //移動像素
+  const move_duration = 0.25 //移動時間
+  const move_speed = 1500 //走路擺動
+  const last_move = 20 // 最後移動的間距微調
+
+  let moveing = false;
+  let moveing_previous //前一個移動的方向
+  let moveing_setTimeout 
+  let object_view = 150; //判斷物體是否觸發的視野
+
+  var screen_width = $(window).width();
+  var screen_height = $(window).height();
+  
+  //暫存角色的 width height
+  var character_me_width
+  var character_me_height
+  var map_height
+  let into_id = ""; //進入點的 id
+  
+  var vm = new Vue({
+    el: '#content',
+    data:{
+      keyState: {
+        _38: false,
+        _37: false,
+        _39: false,
+        _40: false
+      },
+      character:[{
+        id: "me",
+        src: "https://mapsystem3245.firebaseapp.com/img5/down_0.png",
+        frame_number: 3,
+        width: 120,
+        height: 150,
+        x: 1500,
+        y: 450,
+        hit_top: 120,
+        hit_left: 0,
+        hit_bottom: 150,
+        hit_right: 69
+      }],
+      obj: [
+        {
+          id: 1,
+          src: "",
+          x: 1826,
+          y: 140,
+          width: 372,
+          height: 335,
+          _see : false
+        },{
+          id:3,
+          src:"",
+          x: 1988,
+          y: 376,
+          width: 62,
+          height: 128,
+          _see : false,
+          url: "new_index_into_0209.html",
+          type: "into"
+        },{
+          id:4,
+          src:"",
+          x: 62,
+          y: 753,
+          width: 477,
+          height: 255,
+          _see : true,
+          type: "youtube"
+        },{
+          id:5,
+          src:"",
+          x: 918,
+          y: 749,
+          width: 350,
+          height: 414,
+          _see : true,
+          type: "twitter22"
+        },{
+          id:6,
+          src:"",
+          x: 514,
+          y: 414,
+          width: 79,
+          height: 113,
+          _see : false,
+          url: "https://www.hty.com.tw/product.php?act=view&no=6&cid=71",
+          type: "into"
+        },
+        {
+          id: 7,
+          src: "",
+          _see : true,
+          type: "npc_fixed_talk",
+        },
+        {
+          id: 8,
+          src: "",
+          _see : true,
+          type: "npc_ppl",
+        },
+        {
+          id: 9,
+          src: "",
+          _see : true,
+          type: "npc_ppl2",
+        },
+        {
+          id: 10,
+          src: "",
+          _see : true,
+          type: "npc_ppl3",
+        },
+        {
+          id: 11,
+          src:"",
+          x: 1308,
+          y: 749,
+          width: 350,
+          height: 414,
+          _see : true,
+          type: "draw-gpt"
+        }
+      ]
+    },
+    methods: {
+    },
+    watch:{
+      "keyState._38":function(data){
+        if(data) return move(38)
+      },
+      "keyState._37":function(data){
+        if(data) return move(37)
+      },
+      "keyState._39":function(data){
+        if(data) return move(39)
+      },
+      "keyState._40":function(data){
+        if(data) return move(40)
+      }
+    }
+  })
+  
+  //gsap 初始化設定
+  //https://greensock.com/cheatsheet/
+  //https://greensock.com/docs/v2/Easing
+  
+  gsap.config({
+    force3D : true
+  })
+  gsap.defaults({
+    ease: Power0.easeNone
+    //ease: Bounce.easeOut 
+  });
+  
+  $(function(){
+    character_load();
+  })
+  
+  function character_load(){
+    //將 map 的捲軸移到主角的位置
+    character_me_width = $("#character_me").width();
+    character_me_height = $("#character_me").height();
+    map_height = $("#map").height()
+    
+    var _x = $("#character_me").offset().left - (screen_width / 2) + character_me_width/2;
+    var _y = $("#character_me").offset().top - (screen_height / 2) + character_me_width/2;
+    gsap.to("#content", {duration: 0, scrollTo: {y: _y, x: _x}, onComplete: function(){
+      $("body").keydown(function( event ) {
+        if(event.keyCode == 32) return jump();
+        if(event.keyCode == 13) return read();
+        vm.keyState["_" + event.keyCode] = true;
+      })
+      $("body").keyup(function( event ) {
+        vm.keyState["_" + event.keyCode] = false;
+      })
+    }});
+  }
+  function get_people_x(){
+    return vm.character[0].x + gsap.getProperty("#character_me", "x");
+  }
+  function get_people_y(){
+    return vm.character[0].y + gsap.getProperty("#character_me", "y");
+  }
+  function collision(which,people_x,people_y){
+    let hit_object = [];
+    if(which == "37" || which == "39"){//左右
+      for(var i=0;i<vm.obj.length;i++){
+        //初始值調整
+        vm.obj[i]._see = false
+        
+        var obj_y1 = vm.obj[i].y; //沒加至點
+        var obj_y2 = vm.obj[i].y + vm.obj[i].height; //沒加至點
+        var obj_x1 = vm.obj[i].x ; //沒加至點
+        var obj_x2 = vm.obj[i].x + vm.obj[i].width; //沒加至點
+        
+        var view_obj_y1 = obj_y1 - object_view
+        var view_obj_y2 = obj_y2 + object_view
+        var view_obj_x1 = obj_x1 - object_view
+        var view_obj_x2 = obj_x2 + object_view
+        
+        if(which == "37"){//往左
+          var people_xx1 = people_x + vm.character[0].hit_left - move_distance;
+          
+          // 判斷視野
+          if (people_xx1 > view_obj_x1 && people_xx1 < view_obj_x2){
+            var people_y = get_people_y();
+            var people_yy1 = people_y + vm.character[0].hit_top
+            var people_yy2 = people_y + vm.character[0].hit_bottom
+            if (people_yy1 < view_obj_y2 && people_yy2 > view_obj_y1) {
+              vm.obj[i]._see = true
+            }
+          }
+          
+          if (people_xx1 > obj_x1 && people_xx1 < obj_x2){
+            var people_yy1 = people_y + vm.character[0].hit_top
+            var people_yy2 = people_y + vm.character[0].hit_bottom
+            if (people_yy1 < obj_y2 && people_yy2 > obj_y1) {
+              hit_object.push({
+                ...vm.obj[i],
+                last_distance : (people_x + vm.character[0].hit_left) - obj_x2
+              })
+            }
+          }
+        }
+        if(which == "39"){//往右
+          var people_xx2 = people_x + vm.character[0].hit_right + move_distance;
+          
+          
+         // 判斷視野
+          if (people_xx2 > view_obj_x1 && people_xx2 < view_obj_x2){
+              var people_y = get_people_y();
+              var people_yy1 = people_y + vm.character[0].hit_top
+              var people_yy2 = people_y + vm.character[0].hit_bottom
+              if (people_yy1 < view_obj_y2 && people_yy2 > view_obj_y1){
+                 vm.obj[i]._see = true
+              }
+            
+          }
+
+            if (people_xx2 > obj_x1 && people_xx2 < obj_x2){
+              var people_yy1 = people_y + vm.character[0].hit_top
+              var people_yy2 = people_y + vm.character[0].hit_bottom
+              if (people_yy1 < obj_y2 && people_yy2 > obj_y1){
+                hit_object.push({
+                  ...vm.obj[i],
+                  last_distance : obj_x1 - (people_x + vm.character[0].hit_right)
+                })
+              }
+            }
+
+          
+        }
+      }
+    }
+    if(which == "38" || which == "40"){//上下
+     for(var i=0;i<vm.obj.length;i++){
+       vm.obj[i]._see = false
+       
+        var obj_y1 = vm.obj[i].y; //沒加至點
+        var obj_y2 = vm.obj[i].y + vm.obj[i].height; //沒加至點
+        var obj_x1 = vm.obj[i].x ; //沒加至點
+        var obj_x2 = vm.obj[i].x + vm.obj[i].width; //沒加至點
+       
+        var view_obj_y1 = obj_y1 - object_view
+        var view_obj_y2 = obj_y2 + object_view
+        var view_obj_x1 = obj_x1 - object_view
+        var view_obj_x2 = obj_x2 + object_view
+       
+        if(which == "38"){//往上
+          var people_yy1 = people_y + vm.character[0].hit_top - move_distance;
+          
+          // 判斷視野
+          if(people_yy1 < view_obj_y2 && people_yy1 > view_obj_y1){
+            var people_xx1 = people_x + vm.character[0].hit_left;
+            var people_xx2 = people_x + vm.character[0].hit_right
+            if (people_xx1 < view_obj_x2 && people_xx2 > view_obj_x1){
+              vm.obj[i]._see = true
+            }
+          }
+          
+          if(people_yy1 < obj_y2 && people_yy1 > obj_y1){
+            var people_xx1 = people_x + vm.character[0].hit_left;
+            var people_xx2 = people_x + vm.character[0].hit_right
+            if (people_xx1 < obj_x2 && people_xx2 > obj_x1){
+              hit_object.push({
+                ...vm.obj[i],
+                last_distance : (people_y + vm.character[0].hit_top) - obj_y2
+              })
+            }
+          }
+        }
+       if(which == "40"){//往下
+          var people_yy2 = people_y + vm.character[0].hit_bottom + move_distance;
+         
+          // 判斷視野
+          if(people_yy2 > view_obj_y1 && people_yy2 < view_obj_y2){
+            var people_xx1 = people_x + vm.character[0].hit_left;
+            var people_xx2 = people_x + vm.character[0].hit_right
+            if (people_xx1 < view_obj_x2 && people_xx2 > view_obj_x1){
+              vm.obj[i]._see = true
+            }
+          }
+
+          if(people_yy2 > obj_y1 && people_yy2 < obj_y2){
+            var people_x = get_people_x();
+            var people_xx1 = people_x + vm.character[0].hit_left;
+            var people_xx2 = people_x + vm.character[0].hit_right
+            if (people_xx1 < obj_x2 && people_xx2 > obj_x1){
+              hit_object.push({
+                ...vm.obj[i],
+                last_distance : obj_y1 - (people_y + vm.character[0].hit_bottom)
+              })
+            }
+          }
+       }
+      }
+    }
+    
+    return {
+      hit_object,
+      people_x,
+      people_y
+    }
+  }
+  function clear_move(direction){
+    clearTimeout(moveing_setTimeout);
+    moveing = false;
+    if(direction) $("#character_me img").attr("src",`https://mapsystem3245.firebaseapp.com/img5/${direction}_0.png`);
+  }
+  function role_move(direction,step,full){
+    if(step === false) return clear_move(direction)
+    moveing = true;
+    let move_step = step || 0 ;
+    vm.character[0].src = `https://mapsystem3245.firebaseapp.com/img5/${direction}_${move_step}.png`;
+    var _second = full ? move_speed : move_speed*2;
+     moveing_setTimeout = setTimeout(function(){
+       step = step + 1;
+       if(step >= vm.character[0].frame_number) step = false ;
+       return role_move(direction,step,full)
+     }, (move_duration / (vm.character[0].frame_number-1)) * _second )
+  }
+  function get_direction(which){
+    if(which == "38") return "up";
+    if(which == "40") return "down";
+    if(which == "37") return "left"
+    if(which == "39") return "right"
+  }
+  function move(which){
+    if(into_id) return; //有進入點
+    
+    var people_x = get_people_x();
+    var people_y = get_people_y();
+    
+    //如果方向不一致，則把動畫清掉
+    if(moveing_previous != which) clear_move();
+    moveing_previous = which;
+    
+    //每次移動前判斷是否有碰撞
+    let _collision = collision(which,people_x,people_y);
+    
+    var distance = move_distance; //這次要移動的間距
+    if(_collision.hit_object.length){ //代表有碰撞
+      for(var i=0;i<_collision.hit_object.length;i++){
+        if(_collision.hit_object[i].last_distance <= distance){
+          distance = _collision.hit_object[i].last_distance;
+        }
+        if(_collision.hit_object[i].type == "into") {
+          into_id = "obj_" + _collision.hit_object[i].id;
+          distance = move_distance;
+          break;
+        }
+      }
+      if(distance < last_move){ //假如能移動的距離太小就不移動了
+        gsap.killTweensOf("#character_me");
+        gsap.killTweensOf("#content");
+        clear_move(get_direction(which));
+        return;
+      }
+    }
+
+    if(which == "38"){//上
+        gsap.to("#character_me",{
+          y: `-=${distance}`,
+          overwrite:true,
+          duration: move_duration,
+          onStart:function(){},
+          onComplete:function(){
+            if(into_id) return $("#" + into_id + ">a").trigger("click")
+            setTimeout(function(){
+              if(vm.keyState._38) move(38)
+            },5)
+          },
+          onUpdate: function(){
+            if(!moveing) role_move("up",1,distance == move_distance);
+          }
+        })
+
+        if( map_height - people_y - screen_height/2 - character_me_height/2 > 0){
+          gsap.to("#content", {
+            duration : move_duration,
+            overwrite: true,
+            scrollTo: {y: `-=${distance}`}
+          });
+        }
+      }else if(which == "40"){//下
+         gsap.to("#character_me",{
+          y: `+=${distance}`,
+          overwrite:true,
+          duration: move_duration,
+          onStart:function(){},
+          onComplete:function(){
+            if(into_id) return $("#" + into_id + ">a").trigger("click")
+            setTimeout(function(){
+              if(vm.keyState._40) move(40)
+            },5)
+          },
+          onUpdate: function(){
+            if(!moveing) role_move("down",1,distance == move_distance);
+          }
+        })
+
+        if(people_y > screen_height/2 - character_me_height/2 ){
+          gsap.to("#content", {
+            duration: move_duration,
+            overwrite:true,
+            scrollTo: {y: `+=${distance}`}
+          });
+        }
+      }else if(which == "37"){//左
+        gsap.to("#character_me",{
+          x: `-=${distance}`,
+          overwrite:true,
+          duration: move_duration,
+          onComplete:function(){
+            if(into_id) return $("#" + into_id + ">a").trigger("click")
+            setTimeout(function(){
+              if(vm.keyState._37) move(37) 
+            },5)
+          },
+          onStart:function(){},
+          onUpdate:function(){
+            if(!moveing) role_move("left",1,distance == move_distance);
+          }
+        })
+        
+        if( $("#map").width() - people_x - screen_width/2 - character_me_width /2 > 0){
+          gsap.to("#content", {
+            duration : move_duration,
+            overwrite:true,
+            scrollTo: {x: `-=${distance}`}
+          });
+        }
+        
+      }else if(which == "39"){//右
+        gsap.to("#character_me",{
+          x: `+=${distance}`,
+          overwrite:true,
+          duration : move_duration,
+          onComplete:function(){
+            if(into_id) return $("#" + into_id + ">a").trigger("click")
+            setTimeout(function(){
+              if(vm.keyState._39) move(39)
+            },5)
+          },
+          onStart:function(){},
+          onUpdate:function(){
+            if(!moveing) role_move("right",1,distance == move_distance);
+          }
+        })
+        if(people_x > screen_width/2 - character_me_width /2 ){
+          gsap.to("#content", {
+            duration : move_duration,
+            overwrite: true,
+            scrollTo: {x: `+=${distance}`}
+          });
+        }
+        
+      }
+  }
+  function read(){
+    for(var i=0;i<vm.obj.length;i++){
+      if(vm.obj[i]._see){
+        //讀取這個物件的訊息
+      }
+    }
+  }
+  function jump(){//角色跳躍
+//    gsap.to("#character_me",{
+//      y: `-=50`,
+//      duration : .4,
+//      onComplete:function(){
+//        
+//      },
+//      onStart:function(){},
+//      onUpdate:function(){}
+//    })
+  }
+  
+//http://git.blivesta.com/animsition
+$(document).ready(function() {
+  $(".animsition").animsition({
+    inClass: 'fade-in',
+    outClass: 'fade-out',
+    inDuration: 1500,
+    outDuration: 800,
+    linkElement: '.animsition-link',
+    // e.g. linkElement: 'a:not([target="_blank"]):not([href^="#"])'
+    loading: true,
+    loadingParentElement: 'body', //animsition wrapper element
+    loadingClass: 'animsition-loading',
+    loadingInner: '', // e.g '<img src="loading.svg" />'
+    timeout: false,
+    timeoutCountdown: 5000,
+    onLoadEvent: true,
+    browser: [ 'animation-duration', '-webkit-animation-duration'],
+    // "browser" option allows you to disable the "animsition" in case the css property in the array is not supported by your browser.
+    // The default setting is to disable the "animsition" in a browser that does not support "animation-duration".
+    overlay : false,
+    overlayClass : 'animsition-overlay-slide',
+    overlayParentElement : 'body',
+    transition: function(url){ window.location.href = url; }
+  });
+});
+</script>
+  
+</body>
+</html>

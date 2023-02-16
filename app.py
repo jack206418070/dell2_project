@@ -1,8 +1,8 @@
-import os
+# import os
 import openai
-import json
-from base64 import b64decode
-from pathlib import Path
+# import json
+# from base64 import b64decode
+# from pathlib import Path
 from flask import Flask, render_template, make_response, redirect, url_for, session, flash, jsonify, send_from_directory, request
 from flask_cors import CORS
 
@@ -12,7 +12,7 @@ app = Flask(
   static_url_path='/'
 )
 CORS(app)
-openai.api_key = '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' # your api key
+openai.api_key = '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' # your api key
 openai.Model.list()
 
 def gptImage(prompt):
@@ -46,10 +46,18 @@ def chatAI():
   print(res['choices'][0]['text'].strip())
 # chatAI()
 
-@app.route('/getImage', methods=['POST'])
+@app.route('/api/getImage')
 def getImage():
-  if request.method == 'POST':
-    prompt = request.get_json()['prompt']
-    res = gptImage(prompt)
-    return jsonify(res)
+  prompt = request.args.get('prompt')
+  res = gptImage(prompt)
+  return jsonify(res)
+
+@app.route('/')
+def index():
+  return render_template('index_0216.html')
+
+@app.route('/dell')
+def dell():
+  return render_template('index.html')
+
 app.run()
